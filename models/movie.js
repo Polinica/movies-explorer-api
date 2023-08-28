@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+const mongoose = require('mongoose')
+const validator = require('validator')
 
 const movieSchema = new mongoose.Schema(
   {
@@ -66,8 +66,10 @@ const movieSchema = new mongoose.Schema(
   {
     versionKey: false,
   },
-);
+)
 
-const Movie = mongoose.model('movie', movieSchema);
+const Movie = mongoose.model('movie', movieSchema)
 
-module.exports = { Movie };
+module.exports = {
+  Movie,
+}

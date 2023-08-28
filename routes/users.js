@@ -1,9 +1,15 @@
-const express = require('express');
+const express = require('express')
 // const { celebrate, Joi } = require('celebrate');
 
-const users = express.Router();
+const {
+  getUserInfo,
+} = require('../controllers/users')
 
-// users.get('/me', getUserInfo);
+const users = express.Router()
+
+users.get('/me', getUserInfo)
 // users.patch('/me', updateUserInfo);
 
-module.exports = { users };
+module.exports = {
+  users,
+}
