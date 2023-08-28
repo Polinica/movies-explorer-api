@@ -9,18 +9,25 @@ const {
 const {
   NotFoundError,
 } = require('../errors')
+const {
+  auth,
+} = require('../middlewares/auth')
+
+const {
+  createUser,
+} = require('../controllers/users')
 
 const routes = express.Router()
 
 routes.all('*', express.json())
 
-// routes.post('/signup', );
+routes.post('/signup', createUser)
 
 // routes.post('/signin', );
 
-routes.use('/users', users)
+routes.use('/users', auth, users)
 
-routes.use('/movies', movies)
+routes.use('/movies', auth, movies)
 
 // routes.all('*')
 
