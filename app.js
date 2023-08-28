@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 // modules
 const { routes } = require('./routes');
+const { handleError } = require('./middlewares/handleError');
 
 const { PORT = 3000 } = process.env;
 const DATABASE_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb';
@@ -21,6 +22,9 @@ mongoose
 
 // middlewares
 app.use(routes);
+
+// error handlers
+app.use(handleError);
 
 app.listen(PORT, () => {
   console.log(`App started on port ${PORT}...`);
