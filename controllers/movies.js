@@ -3,7 +3,7 @@ const {
 } = require('../models/movie')
 
 const {
-  ValidationError, NotFoundError, ForbiddenError,
+  ValidationError, NotFoundError, ForbiddenError, ConflictError,
 } = require('../errors')
 
 async function getMovies(req, res, next) {
@@ -53,7 +53,11 @@ async function saveMovie(req, res, next) {
     res.status(201).send(movie)
   } catch (err) {
     if (err.name === 'CastError' || err.name === 'ValidationError') {
-      next(new ValidationError(`Неверные данные в ${err.path ?? 'запросе'}`))
+      next(new ValidationError('Неверные данные в запросе'))
+      return
+    }
+    if (err.code === 11000) {
+      next(new ConflictError('Фильм с таким id уже существует'))
       return
     }
 

@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 
@@ -10,9 +11,8 @@ const {
 } = require('./middlewares/handleError')
 
 const {
-  PORT = 3000,
+  PORT = 3000, DATABASE_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb',
 } = process.env
-const DATABASE_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb'
 
 const app = express()
 

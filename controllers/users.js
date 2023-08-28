@@ -6,12 +6,17 @@
 */
 
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+const {
+  NODE_ENV, JWT_SECRET,
+} = process.env
 
 const {
   User,
 } = require('../models/user')
 const {
-  NotFoundError, ConflictError, ValidationError,
+  NotFoundError, ConflictError, ValidationError, UnauthorizedError,
 } = require('../errors')
 
 // GET /users/me - возвращает информацию о текущем пользователе
@@ -55,11 +60,21 @@ async function updateUserInfo(req, res, next) {
 
     res.send(user)
   } catch (err) {
+    if (err.name === 'CastError' || err.name === 'ValidationError') {
+      next(new ValidationError('Неверные данные в запросе'))
+      return
+    }
+    if (err.code === 11000) {
+      next(new ConflictError('Пользователь с таким email уже существует'))
+      return
+    }
     next(err)
   }
 }
 
-const SALT_LENGTH = 10
+const {
+  SALT_LENGTH = 10,
+} = process.env
 
 // POST /users — создаёт пользователя
 async function createUser(req, res, next) {
@@ -80,7 +95,7 @@ async function createUser(req, res, next) {
     res.status(201).send(user)
   } catch (err) {
     if (err.name === 'CastError' || err.name === 'ValidationError') {
-      next(new ValidationError(`Неверные данные в ${err.path ?? 'запросе'}`))
+      next(new ValidationError('Неверные данные в запросе'))
       return
     }
     if (err.code === 11000) {
@@ -92,6 +107,44 @@ async function createUser(req, res, next) {
   }
 }
 
+async function login(req, res, next) {
+  try {
+    const {
+      email, password,
+    } = req.body
+
+    const user = await User.findOne({
+      email,
+    }).select('+password')
+
+    if (!user) {
+      throw new UnauthorizedError('Неверные данные для входа')
+    }
+
+    const hasRightPassword = await bcrypt.compare(password, user.password)
+
+    if (!hasRightPassword) {
+      throw new UnauthorizedError('Неверные данные для входа')
+    }
+
+    const token = jwt.sign(
+      {
+        _id: user._id,
+      },
+      NODE_ENV === 'production' ? JWT_SECRET : 'secret',
+      {
+        expiresIn: '7d',
+      },
+    )
+
+    res.send({
+      token,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
 module.exports = {
-  getUserInfo, updateUserInfo, createUser,
+  getUserInfo, updateUserInfo, createUser, login,
 }

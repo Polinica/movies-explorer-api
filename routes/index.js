@@ -14,7 +14,7 @@ const {
 } = require('../middlewares/auth')
 
 const {
-  createUser,
+  createUser, login,
 } = require('../controllers/users')
 
 const routes = express.Router()
@@ -23,7 +23,7 @@ routes.all('*', express.json())
 
 routes.post('/signup', createUser)
 
-// routes.post('/signin', );
+routes.post('/signin', login)
 
 routes.use('/users', auth, users)
 
