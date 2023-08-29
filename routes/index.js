@@ -18,14 +18,14 @@ const {
 } = require('../controllers/users')
 
 const {
-  userInfoValidator, loginValidator,
+  createUserValidator, loginValidator,
 } = require('../utils/validators')
 
 const routes = express.Router()
 
 routes.all('*', express.json())
 
-routes.post('/signup', userInfoValidator, createUser)
+routes.post('/signup', createUserValidator, createUser)
 
 routes.post('/signin', loginValidator, login)
 

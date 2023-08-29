@@ -6,13 +6,13 @@ const {
 } = require('../controllers/users')
 
 const {
-  editableUserInfoValidator,
+  updateUserInfoValidator,
 } = require('../utils/validators')
 
 const users = express.Router()
 
 users.get('/me', getUserInfo)
-users.patch('/me', editableUserInfoValidator, updateUserInfo)
+users.patch('/me', updateUserInfoValidator, updateUserInfo)
 
 module.exports = {
   users,

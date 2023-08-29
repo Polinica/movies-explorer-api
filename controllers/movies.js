@@ -1,10 +1,18 @@
 const {
+  mongoose,
+} = require('mongoose')
+
+const {
   Movie,
 } = require('../models/movie')
 
 const {
-  ValidationError, NotFoundError, ForbiddenError, ConflictError,
+  NotFoundError, ForbiddenError, ConflictError,
 } = require('../errors')
+
+const {
+  handleMongooseError,
+} = require('../utils/handleMongooseError')
 
 async function getMovies(req, res, next) {
   try {
@@ -52,12 +60,13 @@ async function saveMovie(req, res, next) {
     await movie.populate('owner')
     res.status(201).send(movie)
   } catch (err) {
-    if (err.name === 'CastError' || err.name === 'ValidationError') {
-      next(new ValidationError('Неверные данные в запросе'))
+    if (err.name === 'MongoServerError' && err.code === 11000) {
+      next(new ConflictError('Фильм с таким id уже существует'))
       return
     }
-    if (err.code === 11000) {
-      next(new ConflictError('Фильм с таким id уже существует'))
+
+    if (err instanceof mongoose.Error) {
+      next(handleMongooseError(err))
       return
     }
 
@@ -89,8 +98,8 @@ async function deleteMovie(req, res, next) {
 
     res.send(movie)
   } catch (err) {
-    if (err.name === 'CastError') {
-      next(new NotFoundError('Фильм не найден'))
+    if (err instanceof mongoose.Error) {
+      next(handleMongooseError(err))
       return
     }
     next(err)

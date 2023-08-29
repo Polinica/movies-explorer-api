@@ -1,23 +1,23 @@
 const {
-  userInfoValidator,
-} = require('./userInfoValidator')
+  createUserValidator,
+} = require('./createUserValidator')
 
 const {
   loginValidator,
 } = require('./loginValidator')
 
 const {
-  editableUserInfoValidator,
-} = require('./editableUserInfoValidator')
+  updateUserInfoValidator,
+} = require('./updateUserInfoValidator')
 
 const {
-  movieDataValidator,
-} = require('./movieDataValidator')
+  saveMovieValidator,
+} = require('./saveMovieValidator')
 
 const {
   deleteMovieValidator,
 } = require('./deleteMovieValidator')
 
 module.exports = {
-  userInfoValidator, loginValidator, editableUserInfoValidator, movieDataValidator, deleteMovieValidator,
+  createUserValidator, loginValidator, updateUserInfoValidator, saveMovieValidator, deleteMovieValidator,
 }

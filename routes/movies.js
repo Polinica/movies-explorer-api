@@ -6,13 +6,13 @@ const {
 } = require('../controllers/movies')
 
 const {
-  movieDataValidator, deleteMovieValidator,
+  saveMovieValidator, deleteMovieValidator,
 } = require('../utils/validators')
 
 const movies = express.Router()
 
 movies.get('/', getMovies)
-movies.post('/', movieDataValidator, saveMovie)
+movies.post('/', saveMovieValidator, saveMovie)
 movies.delete('/:movieId', deleteMovieValidator, deleteMovie)
 
 module.exports = {

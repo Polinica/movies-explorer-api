@@ -7,6 +7,7 @@
 
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 
 const {
   NODE_ENV, JWT_SECRET,
@@ -16,8 +17,12 @@ const {
   User,
 } = require('../models/user')
 const {
-  NotFoundError, ConflictError, ValidationError, UnauthorizedError,
+  NotFoundError, ConflictError, UnauthorizedError,
 } = require('../errors')
+
+const {
+  handleMongooseError,
+} = require('../utils/handleMongooseError')
 
 // GET /users/me - возвращает информацию о текущем пользователе
 
@@ -60,12 +65,13 @@ async function updateUserInfo(req, res, next) {
 
     res.send(user)
   } catch (err) {
-    if (err.name === 'CastError' || err.name === 'ValidationError') {
-      next(new ValidationError('Неверные данные в запросе'))
+    if (err.name === 'MongoServerError' && err.code === 11000) {
+      next(new ConflictError('Пользователь с таким email уже существует'))
       return
     }
-    if (err.code === 11000) {
-      next(new ConflictError('Пользователь с таким email уже существует'))
+
+    if (err instanceof mongoose.Error) {
+      next(handleMongooseError(err))
       return
     }
     next(err)
@@ -82,7 +88,7 @@ async function createUser(req, res, next) {
     const {
       email, password, name,
     } = req.body
-    const passwordHash = await bcrypt.hash(password, SALT_LENGTH)
+    const passwordHash = await bcrypt.hash(password, +SALT_LENGTH)
 
     let user = await User.create({
       email,
@@ -94,12 +100,13 @@ async function createUser(req, res, next) {
     delete user.password
     res.status(201).send(user)
   } catch (err) {
-    if (err.name === 'CastError' || err.name === 'ValidationError') {
-      next(new ValidationError('Неверные данные в запросе'))
+    if (err.name === 'MongoServerError' && err.code === 11000) {
+      next(new ConflictError('Пользователь с таким email уже существует'))
       return
     }
-    if (err.code === 11000) {
-      next(new ConflictError('Пользователь с таким email уже существует'))
+
+    if (err instanceof mongoose.Error) {
+      next(handleMongooseError(err))
       return
     }
 

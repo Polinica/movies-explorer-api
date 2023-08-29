@@ -2,7 +2,7 @@ const {
   celebrate, Joi,
 } = require('celebrate')
 
-const movieDataValidator = celebrate({
+const saveMovieValidator = celebrate({
   body: Joi.object().keys({
     country: Joi.string().required(),
     director: Joi.string().required(),
@@ -19,5 +19,5 @@ const movieDataValidator = celebrate({
 })
 
 module.exports = {
-  movieDataValidator,
+  saveMovieValidator,
 }
