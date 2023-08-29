@@ -14,6 +14,10 @@ const {
 } = require('./middlewares/handleError')
 
 const {
+  requestLogger, errorLogger,
+} = require('./middlewares/logger')
+
+const {
   PORT = 3000, DATABASE_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb',
 } = process.env
 
@@ -30,9 +34,11 @@ mongoose
   })
 
 // middlewares
+app.use(requestLogger)
 app.use(routes)
 
 // error handlers
+app.use(errorLogger)
 app.use(errors())
 app.use(handleError)
 
