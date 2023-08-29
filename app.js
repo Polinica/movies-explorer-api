@@ -1,6 +1,9 @@
 require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
+const {
+  errors,
+} = require('celebrate')
 
 // modules
 const {
@@ -30,6 +33,7 @@ mongoose
 app.use(routes)
 
 // error handlers
+app.use(errors())
 app.use(handleError)
 
 app.listen(PORT, () => {

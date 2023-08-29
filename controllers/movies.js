@@ -89,6 +89,10 @@ async function deleteMovie(req, res, next) {
 
     res.send(movie)
   } catch (err) {
+    if (err.name === 'CastError') {
+      next(new NotFoundError('Фильм не найден'))
+      return
+    }
     next(err)
   }
 }
