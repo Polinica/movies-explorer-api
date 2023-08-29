@@ -60,7 +60,7 @@ async function saveMovie(req, res, next) {
     await movie.populate('owner')
     res.status(201).send(movie)
   } catch (err) {
-    if (err.name === 'MongoServerError' && err.code === 11000) {
+    if (err.code === 11000) {
       next(new ConflictError('Фильм с таким id уже существует'))
       return
     }

@@ -29,11 +29,11 @@ routes.post('/signup', createUserValidator, createUser)
 
 routes.post('/signin', loginValidator, login)
 
-routes.use('/users', auth, users)
+routes.all('*', auth)
 
-routes.use('/movies', auth, movies)
+routes.use('/users', users)
 
-// routes.all('*')
+routes.use('/movies', movies)
 
 routes.all('*', (req, res, next) => {
   next(new NotFoundError('Неверный адрес запроса'))

@@ -65,7 +65,7 @@ async function updateUserInfo(req, res, next) {
 
     res.send(user)
   } catch (err) {
-    if (err.name === 'MongoServerError' && err.code === 11000) {
+    if (err.code === 11000) {
       next(new ConflictError('Пользователь с таким email уже существует'))
       return
     }
@@ -100,7 +100,7 @@ async function createUser(req, res, next) {
     delete user.password
     res.status(201).send(user)
   } catch (err) {
-    if (err.name === 'MongoServerError' && err.code === 11000) {
+    if (err.code === 11000) {
       next(new ConflictError('Пользователь с таким email уже существует'))
       return
     }
