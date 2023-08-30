@@ -23,9 +23,11 @@ const {
   handleError,
 } = require('./middlewares/handleError')
 
+const configDefault = require('./utils/configDefault')
+
 // params
 const {
-  PORT = 3000, DATABASE_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb',
+  PORT = configDefault.PORT, DATABASE_URL = configDefault.DATABASE_URL,
 } = process.env
 
 const app = express()

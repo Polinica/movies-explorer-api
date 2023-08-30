@@ -21,6 +21,10 @@ const {
   createUserValidator, loginValidator,
 } = require('../utils/validators')
 
+const {
+  ERROR_MESSAGES,
+} = require('../utils/constants')
+
 const routes = express.Router()
 
 routes.all('*', express.json())
@@ -36,7 +40,7 @@ routes.use('/users', users)
 routes.use('/movies', movies)
 
 routes.all('*', (req, res, next) => {
-  next(new NotFoundError('Неверный адрес запроса'))
+  next(new NotFoundError(ERROR_MESSAGES.PAGE_NOT_FOUND))
 })
 
 module.exports = {

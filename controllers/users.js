@@ -9,8 +9,10 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 
+const configDefault = require('../utils/configDefault')
+
 const {
-  NODE_ENV, JWT_SECRET,
+  JWT_SECRET = configDefault.JWT_SECRET,
 } = process.env
 
 const {
@@ -24,6 +26,10 @@ const {
   handleMongooseError,
 } = require('../utils/handleMongooseError')
 
+const {
+  ERROR_MESSAGES,
+} = require('../utils/constants')
+
 // GET /users/me - возвращает информацию о текущем пользователе
 
 async function getUserInfo(req, res, next) {
@@ -32,7 +38,7 @@ async function getUserInfo(req, res, next) {
     const user = await User.findById(userId)
 
     if (!user) {
-      throw new NotFoundError('Пользователь не найден')
+      throw new NotFoundError(ERROR_MESSAGES.USER_NOT_FOUND)
     }
 
     res.send(user)
@@ -60,13 +66,13 @@ async function updateUserInfo(req, res, next) {
     )
 
     if (!user) {
-      throw new NotFoundError('Пользователь не найден')
+      throw new NotFoundError(ERROR_MESSAGES.USER_NOT_FOUND)
     }
 
     res.send(user)
   } catch (err) {
     if (err.code === 11000) {
-      next(new ConflictError('Пользователь с таким email уже существует'))
+      next(new ConflictError(ERROR_MESSAGES.USER_CONFLICT))
       return
     }
 
@@ -79,7 +85,7 @@ async function updateUserInfo(req, res, next) {
 }
 
 const {
-  SALT_LENGTH = 10,
+  SALT_LENGTH = configDefault.SALT_LENGTH,
 } = process.env
 
 // POST /users — создаёт пользователя
@@ -101,7 +107,7 @@ async function createUser(req, res, next) {
     res.status(201).send(user)
   } catch (err) {
     if (err.code === 11000) {
-      next(new ConflictError('Пользователь с таким email уже существует'))
+      next(new ConflictError(ERROR_MESSAGES.USER_CONFLICT))
       return
     }
 
@@ -125,20 +131,20 @@ async function login(req, res, next) {
     }).select('+password')
 
     if (!user) {
-      throw new UnauthorizedError('Неверные данные для входа')
+      throw new UnauthorizedError(ERROR_MESSAGES.WRONG_CREDENTIALS)
     }
 
     const hasRightPassword = await bcrypt.compare(password, user.password)
 
     if (!hasRightPassword) {
-      throw new UnauthorizedError('Неверные данные для входа')
+      throw new UnauthorizedError(ERROR_MESSAGES.WRONG_CREDENTIALS)
     }
 
     const token = jwt.sign(
       {
         _id: user._id,
       },
-      NODE_ENV === 'production' ? JWT_SECRET : 'secret',
+      JWT_SECRET,
       {
         expiresIn: '7d',
       },

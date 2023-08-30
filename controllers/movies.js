@@ -14,6 +14,10 @@ const {
   handleMongooseError,
 } = require('../utils/handleMongooseError')
 
+const {
+  ERROR_MESSAGES,
+} = require('../utils/constants')
+
 async function getMovies(req, res, next) {
   try {
     const userId = req.user._id
@@ -63,7 +67,7 @@ async function saveMovie(req, res, next) {
     res.status(201).send(movie)
   } catch (err) {
     if (err.code === 11000) {
-      next(new ConflictError('Фильм с таким id уже существует'))
+      next(new ConflictError(ERROR_MESSAGES.MOVIE_CONFLICT))
       return
     }
 
@@ -86,14 +90,14 @@ async function deleteMovie(req, res, next) {
     const movie = await Movie.findById(id).populate('owner')
 
     if (!movie) {
-      throw new NotFoundError('Фильм не найден')
+      throw new NotFoundError(ERROR_MESSAGES.MOVIE_NOT_FOUND)
     }
 
     const ownerId = movie.owner.id
     const userId = req.user._id
 
     if (ownerId !== userId) {
-      throw new ForbiddenError('Удалить фильм может только владелец')
+      throw new ForbiddenError(ERROR_MESSAGES.UNAUTHORIZED)
     }
 
     await Movie.findByIdAndRemove(id)

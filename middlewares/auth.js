@@ -4,7 +4,13 @@ const {
 } = require('../errors')
 
 const {
-  NODE_ENV, JWT_SECRET,
+  ERROR_MESSAGES,
+} = require('../utils/constants')
+
+const configDefault = require('../utils/configDefault')
+
+const {
+  JWT_SECRET = configDefault.JWT_SECRET,
 } = process.env
 
 function auth(req, res, next) {
@@ -15,7 +21,7 @@ function auth(req, res, next) {
 
     if (!authorization || !authorization.startsWith('Bearer ')) {
       throw new UnauthorizedError(
-        'Для обработки запроса необходима авторизация',
+        ERROR_MESSAGES.UNAUTHORIZED,
       )
     }
 
@@ -25,11 +31,11 @@ function auth(req, res, next) {
     try {
       payload = jwt.verify(
         token,
-        NODE_ENV === 'production' ? JWT_SECRET : 'secret',
+        JWT_SECRET,
       )
     } catch (err) {
       throw new UnauthorizedError(
-        'Для обработки запроса необходима авторизация',
+        ERROR_MESSAGES.UNAUTHORIZED,
       )
     }
 
